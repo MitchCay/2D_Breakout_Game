@@ -13,18 +13,43 @@
 <canvas id="myCanvas" width="480" height="320"></canvas>
 
 <script>
+	// canvas variables
 	var canvas = document.getElementById("myCanvas");
 	var ctx = canvas.getContext("2d");
 
+	// ball variables
 	var x = canvas.width/2;
 	var y = canvas.height-30;
+	var ballRadius = 10;
+	var ballColor = "MidnightBlue";
+	
+	// ball movement variables
 	var dx = 2;
 	var dy = -2;
+	var colorArray = [
+		"Aquamarine",
+		"Blue",
+		"BlueViolet",
+		"Chartreuse",
+		"Chocolate",
+		"Crimson",
+		"Coral",
+		"DeepPink",
+		"DodgerBlue",
+		"ForestGreen",
+		"Fuchsia",
+		"Gold",
+		"Indigo",
+		"DarkTurquoise",
+		"HotPink",
+		"LawnGreen",
+		"RebeccaPurple"
+	];
 
 	function drawBall() {
 		ctx.beginPath();
-		ctx.arc(x, y, 10, 0, Math.PI*2);
-		ctx.fillStyle = "#0095DD";
+		ctx.arc(x, y, ballRadius, 0, Math.PI*2);
+		ctx.fillStyle = ballColor;
 		ctx.fill();
 		ctx.closePath();
 	}
@@ -32,10 +57,21 @@
 	function draw() {
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
 		drawBall();
+
+		if(x + dx > canvas.width-ballRadius || x + dx < ballRadius) {
+			dx = -dx;
+			ballColor = colorArray[Math.floor(Math.random()*colorArray.length)];
+		}
+
+		if(y + dy > canvas.height-ballRadius || y + dy < ballRadius) {
+			dy = -dy;
+			ballColor = colorArray[Math.floor(Math.random()*colorArray.length)];
+		}
+
 		x += dx;
 		y += dy;
 	}
-	
+
 	setInterval(draw, 10);
 </script>
 
