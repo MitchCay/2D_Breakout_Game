@@ -10,7 +10,7 @@
 </head>
 <body>
 	
-<canvas id="myCanvas" width="480" height="320"></canvas>
+<canvas id="myCanvas" width="480" height="640"></canvas>
 
 <script>
 	// canvas variables
@@ -24,8 +24,9 @@
 	var ballColor = "MidnightBlue";
 	
 	// ball movement variables
-	var dx = 2;
-	var dy = -2;
+	var plusOrMinus = Math.random() < 0.5 ? -1 : 1;
+	var dx = 2*plusOrMinus;
+	var dy = -3*(Math.random()*0.5+0.5);
 	var colorArray = [
 		"Aquamarine",
 		"Blue",
@@ -50,36 +51,42 @@
 	var paddleHeight = 10;
 	var paddleWidth = 75;
 	var paddleX = (canvas.width-paddleWidth) / 2;
-	var paddleMoveSpeed = 5;
+	var paddleMoveSpeed = 10;
 
 	// key press variables
 	var rightPressed = false;
 	var leftPressed = false;
 
 	// brick variables
-	var brickRowCount = 3;
+	var brickRowCount = 7;
 	var brickColumnCount = 5;
 	var brickWidth = 75;
 	var brickHeight = 20;
 	var brickPadding = 10;
-	var brickOffsetTop = 30;
+	var brickOffsetTop = 90;
 	var brickOffsetLeft = 30;
+	var hitCount = 1;
+	var brickColor = hitCount - 1;
+	if(brickColor > colorArray.length) {
+		brickColor = brickColor - colorArray.length;
+	}
 
 	var bricks = [];
 	for(var c=0; c<brickColumnCount; c++) {
 		bricks[c] = [];
 		for(var r=0; r<brickRowCount; r++) {
-			bricks[c][r] = { x: 0, y: 0, status: 1};
+			bricks[c][r] = { x: 0, y: 0, status: 1, hits: hitCount};
 		}
 	}
 
 	// score variables
 	var score = 0;
-	var lives = 3;
+	var lives = 5;
+	var level = 1;
 
 	document.addEventListener("keydown", keyDownHandler, false);
 	document.addEventListener("keyup", keyUpHandler, false);
-	document.addEventListener("mousemove", mouseMoveHandler, false);
+	// document.addEventListener("mousemove", mouseMoveHandler, false);
 
 	function keyDownHandler(e) {
 		if(e.key == "Right" || e.key == "ArrowRight") {
@@ -99,12 +106,12 @@
 		}
 	}
 
-	function mouseMoveHandler(e) {
+	/*function mouseMoveHandler(e) {
 		var relativeX = e.clientX - canvas.offsetLeft;
 		if(relativeX > 0 && relativeX < canvas.width) {
 			paddleX = relativeX - paddleWidth/2;
 		}
-	}
+	}*/
 
 	function collisionDetection() {
     	for(var c=0; c<brickColumnCount; c++) {
@@ -114,11 +121,31 @@
             		if(x > b.x && x < b.x+brickWidth && y > b.y && y < b.y+brickHeight) {
 	                	dy = -dy*1.1;
 	                	dx = dx*1.1;
-	                	b.status = 0;
-	                	score++;
-	                	if(score == brickRowCount*brickColumnCount) {
-	                		alert("YOU WIN, CONGRATULATIONS!");
-	                		document.location.reload();
+	                	b.hits--;
+	                	if(b.hits == 0){
+	                		b.status = 0;
+	                		score++;
+	                	}
+	                	if(score == brickRowCount*brickColumnCount*level) {
+	                		level++;
+	                		hitCount++;
+	                		
+	                		// reset ball and paddle
+	                		x = canvas.width/2;
+							y = canvas.height-30;
+							dx = 2*plusOrMinus;
+							dy = -3*(Math.random()*0.5+0.5);
+
+							paddleX = (canvas.width-paddleWidth) / 2;
+
+							// create new brick field with updated bricks
+							for(var c=0; c<brickColumnCount; c++) {
+								bricks[c] = [];
+								for(var r=0; r<brickRowCount; r++) {
+									bricks[c][r] = { x: 0, y: 0, status: 1, hits: hitCount};
+								}
+							}
+	                		
 	                	}
             		}
                 }
@@ -136,6 +163,12 @@
 		ctx.font = "16px Arial";
 		ctx.fillStyle = "0095DD";
 		ctx.fillText("Lives: "+lives, canvas.width-65, 20);
+	}
+
+	function drawLevel() {
+		ctx.font = "16px Arial";
+		ctx.fillStyle = "0095DD";
+		ctx.fillText("Level: "+level, canvas.width-270, 20);
 	}
 
 	function drawBall() {
@@ -164,7 +197,7 @@
 					bricks[c][r].y = brickY;
 					ctx.beginPath();
 					ctx.rect(brickX, brickY, brickWidth, brickHeight);
-					ctx.fillStyle = "#0095DD";
+					ctx.fillStyle = colorArray[bricks[c][r].hits];
 					ctx.fill();
 					ctx.closePath();
 				}
@@ -179,6 +212,7 @@
 		drawPaddle();
 		drawScore();
 		drawLives();
+		drawLevel();
 		collisionDetection();
 
 		if(x + dx > canvas.width-ballRadius || x + dx < ballRadius) {
