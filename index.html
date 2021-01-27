@@ -197,7 +197,11 @@
 					bricks[c][r].y = brickY;
 					ctx.beginPath();
 					ctx.rect(brickX, brickY, brickWidth, brickHeight);
-					ctx.fillStyle = colorArray[bricks[c][r].hits];
+					brickColor = bricks[c][r].hits - 1;
+					if(brickColor > colorArray.length) {
+						brickColor = brickColor - colorArray.length;
+					}
+					ctx.fillStyle = colorArray[brickColor];
 					ctx.fill();
 					ctx.closePath();
 				}
