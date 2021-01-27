@@ -81,7 +81,7 @@
 
 	// score variables
 	var score = 0;
-	var lives = 5;
+	var lives = 500;
 	var level = 1;
 
 	document.addEventListener("keydown", keyDownHandler, false);
@@ -133,6 +133,7 @@
 	                		// reset ball and paddle
 	                		x = canvas.width/2;
 							y = canvas.height-30;
+							plusOrMinus = Math.random() < 0.5 ? -1 : 1;
 							dx = 2*plusOrMinus;
 							dy = -3*(Math.random()*0.5+0.5);
 
@@ -242,8 +243,10 @@
 				else {
 					x = canvas.width/2;
 					y = canvas.height-30;
-					dx=2
-					dy=-2
+					plusOrMinus = Math.random() < 0.5 ? -1 : 1;
+	                dx = 2*plusOrMinus;
+	                dy = -3*(Math.random()*0.5+0.5);
+	                
 					paddleX = (canvas.width-paddleWidth)/2;
 				}
 			}
